@@ -1,0 +1,54 @@
+//File will take text from a supplied plain text file and analyse to return letter counts
+//Analysis can be made case insensitive
+//Top ten letters are displayed
+//White space and non-letter characters are ignored
+
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+
+namespace letterFrequencies
+{
+	class MainClass
+	{
+		public static void Main(string[] args)
+		{
+			string text = File.ReadAllText(args[0]);   //Get text to be analysed from file
+
+			int charCount = text.Count(char.IsLetter); //Get total character count from text (ignores whitespace)
+			Console.WriteLine(charCount);              //Display character count
+
+			Console.WriteLine("Make analysis case insensitive? y/n:"); //Ask for analysis type
+			string answer = Console.ReadLine().ToLower();     //Accept Y or y
+			if (answer.Equals("y")) 	//All other inputs return false value and will run case sensitive
+			{
+				text=text.ToLower();			//Remove cases from text
+			}
+
+			int[] letterCounts = new int[(int)char.MaxValue];  //Create array for individual letter counting
+
+			foreach (char letter in text)
+			{
+				letterCounts[(int)letter]++; 						   //Count instances of each letter in text
+			}
+
+			Dictionary<char, int> countDictionary = new Dictionary<char, int>(); //Create Dictionary to store letter keys and count values
+
+			for (int i = 0; i < (int)char.MaxValue; i++)
+			{
+				if (letterCounts[i] > 0 && char.IsLetter((char)i)) //Ignore whitespace and unused letters
+				{
+					countDictionary.Add((char)i, letterCounts[i]);      //Adds used letters and counts to dictionary 
+
+				}
+			}
+
+			var sortedCount = from entry in countDictionary orderby entry.Value descending select entry; //Sort by most used letter
+			foreach (var item in sortedCount.Take(10)) //Take first ten values from the sorted dictionary
+			{
+				Console.WriteLine(item); //Displays letter key and value
+			}
+		}
+	}
+}
